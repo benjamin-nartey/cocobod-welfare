@@ -20,7 +20,7 @@ import { RadialChartComponent } from "@/components/RadialChart";
 
 export const metadata: Metadata = {
   title: "Dashboard",
-  description: "COCOBOD Warefare Dashboard",
+  description: "COCOBOD welfare Dashboard",
 };
 
 const data: PaymentProps[] = [

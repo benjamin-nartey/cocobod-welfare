@@ -21,11 +21,11 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Cocobod Warefare application",
-    default: "Cocobod Warefare application",
+    template: "%s | Cocobod welfare application",
+    default: "Cocobod welfare application",
   },
-  description: "Cocobod Warefare application",
-  applicationName: "Cocobod Warefare application",
+  description: "Cocobod welfare application",
+  applicationName: "Cocobod welfare application",
 };
 
 export default function RootLayout({
