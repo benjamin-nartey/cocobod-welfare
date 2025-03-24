@@ -1,7 +1,7 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Plus, Search, Settings, User2Icon } from "lucide-react";
+import { ChevronDown, Search, Settings, User2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaBalanceScale, FaUsers } from "react-icons/fa";
@@ -34,14 +34,16 @@ const isNotActiveStyles: string =
 
 interface NavlayoutProps {
   children: React.ReactNode;
+  user: UserProps| null
 }
 
-export default function NavLayout({ children }: NavlayoutProps) {
+export default function NavLayout({ children, user }: NavlayoutProps) {
   const pathname = usePathname();
+  console.log({ user });
   return (
     <div className="w-screen h-screen grid lg:grid-cols-[15%_85%] md:grid-cols-[10%_90%] grid-cols-1 overflow-hidden">
       <div className="bg-[#060606] p-4 overflow-x-hidden overflow-y-scroll no-scrollbar lg:block md:block hidden">
-        <div className="h-[30%] flex items-start justify-around flex-col sticky top-0 z-50 bg-inherit">
+        <div className="h-[10%] flex items-start justify-start flex-col sticky top-0 z-50 bg-inherit">
           <div className="flex gap-2 justify-start items-center bg-inherit">
             <Image width={50} height={50} src="/logo-cocobod.png" alt="logo" />
             <div className="text-white lg:flex md:hidden flex flex-col items-start justify-center">
@@ -53,25 +55,22 @@ export default function NavLayout({ children }: NavlayoutProps) {
               </span>
             </div>
           </div>
-          <div className="w-full">
+          {/* <div className="w-full">
             <button className="bg-white text-black lg:p-[0.5rem] md:p-2 p-1 rounded-full lg:w-[90%] md:w-fit w-full hover:bg-[#d4cdcd] flex justify-start items-center gap-2">
               <div className="flex-[0.17]">
-                <Plus
-                  size={25}
-                  className="text-white bg-[#df5d29] rounded-full"
-                />
+                <FaMoneyCheckDollar size={25} className="text-[#df5d29] " />
               </div>
               <span className="whitespace-normal text-left flex-1 lg:block md:hidden block">
-                Create New Project
+                Request Loan
               </span>
             </button>
-          </div>
+          </div> */}
         </div>
 
         <div className="py-16">
           <nav className="flex flex-col w-full gap-2">
             <Link
-              href="/"
+              href="/dashboard"
               className={
                 pathname === "/dashboard" ? isActiveStyles : isNotActiveStyles
               }
@@ -82,25 +81,29 @@ export default function NavLayout({ children }: NavlayoutProps) {
               </span>
             </Link>
             <Link
-              href="/projects"
+              href="/request-loan"
               className={
-                pathname === "/projects" ? isActiveStyles : isNotActiveStyles
+                pathname === "/request-loan"
+                  ? isActiveStyles
+                  : isNotActiveStyles
               }
             >
               <SlBriefcase size={20} className="" />
               <span className="lg:inline-block md:hidden inline-block">
-                Projects
+                Req. loan
               </span>
             </Link>
             <Link
-              href="/tasks"
+              href="/department-approval"
               className={
-                pathname === "/tasks" ? isActiveStyles : isNotActiveStyles
+                pathname === "/department-approval"
+                  ? isActiveStyles
+                  : isNotActiveStyles
               }
             >
               <GrTask size={20} className="" />
               <span className="lg:inline-block md:hidden inline-block">
-                Tasks
+                Dep. approval
               </span>
             </Link>
             <Link
@@ -158,8 +161,8 @@ export default function NavLayout({ children }: NavlayoutProps) {
         <div className="w-full border-b border-b-[#d3b8aa]/50 sticky top-0 z-[99] bg-inherit50 bg-inherit">
           <div className="w-full h-full flex lg:justify-between md:justify-around justify-between items-center lg:p-8 md:p-4 p-2">
             <div className="lg:block md:block hidden">
-              <h1 className="lg:text-2xl md:text-2xl text-sm font-medium- text-[#524946]">
-                Dashboard
+              <h1 className="lg:text-2xl md:text-2xl text-sm font-medium- text-[#524946] capitalize">
+                {pathname.replaceAll(/[/\-]/g, " ")}
               </h1>
             </div>
             <div className="flex justify-around items-center gap-2 lg:w-auto md:w-auto w-full">
@@ -189,8 +192,10 @@ export default function NavLayout({ children }: NavlayoutProps) {
                   <User2Icon />
                 </div>
                 <div className="flex flex-col justify-start items-start">
-                  <span className="text-xs">Benjamin Nartey</span>
-                  <span className="text-xs text-gray-400">Lead Instructor</span>
+                  <span className="text-xs">{user?.name}</span>
+                  <span className="text-xs text-gray-400">
+                    {user?.signature?.member?.user?.designation?.name}
+                  </span>
                 </div>
                 <Button className="w-8 h-8 hover:bg-transparent bg-white grid place-items-center rounded-full ">
                   <ChevronDown className="text-[#524946]" />

@@ -8,11 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Clock } from "lucide-react";
+// import { Clock } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
-import { FaBalanceScale } from "react-icons/fa";
+// import { FaBalanceScale } from "react-icons/fa";
 import { LuChartNoAxesCombined } from "react-icons/lu";
 import { SlBriefcase } from "react-icons/sl";
 import PaymentTable from "./payment-table";
@@ -76,30 +76,30 @@ export default function Dashboard() {
           </SelectContent>
         </Select>
       </div>
-      <div className="w-full grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-1 place-items-center py-4 gap-4">
-        <Link className="w-full" href="/revenue">
+      <div className="w-full grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 place-items-center py-4 gap-4">
+        <Link className="w-full" href="/pending-loans">
           <MetricCard
             color="bg-[#d399e3]"
-            title="Total revenue"
-            dataValue="$538,000"
-            trend="12% increase from last month"
+            title="Pending loans"
+            dataValue="150"
+            trend="120 pending loans that needs you approval"
           >
             <LuChartNoAxesCombined size={25} className="text-white" />
           </MetricCard>
         </Link>
 
-        <Link className="w-full" href="/projects">
+        <Link className="w-full" href="/approved-loans">
           <MetricCard
             color="bg-[#e79577]"
-            title="Projects"
+            title="Approved loans"
             dataValue="220"
-            trend="12% increase from last month"
+            trend="220 loans approved in total"
           >
             <SlBriefcase size={25} className="text-white" />
           </MetricCard>
         </Link>
 
-        <Link className="w-full" href="/time-log">
+        {/* <Link className="w-full" href="/time-log">
           <MetricCard
             color="bg-[#719ddc]"
             title="Time spent"
@@ -108,9 +108,9 @@ export default function Dashboard() {
           >
             <Clock size={25} className="text-white" />
           </MetricCard>
-        </Link>
+        </Link> */}
 
-        <Link className="w-full" href="/resources">
+        {/* <Link className="w-full" href="/resources">
           <MetricCard
             color="bg-[#f0c075]"
             title="Resources"
@@ -119,7 +119,7 @@ export default function Dashboard() {
           >
             <FaBalanceScale size={25} className="text-white" />
           </MetricCard>
-        </Link>
+        </Link> */}
       </div>
 
       <div className="w-full mt-4 flex lg:flex-row md:flex-col flex-col justify-between items-start gap-4">

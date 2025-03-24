@@ -1,25 +1,10 @@
 import type { Metadata } from "next";
-// import { Geist, Geist_Mono } from "next/font/google";
-// import { Poppins } from "next/font/google";
+import { cookies } from "next/headers";
+
 import "../globals.css";
 
 import NavLayout from "@/components/NavLayout";
-
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
-
-// const poppins = Poppins({
-//   style: "normal",
-//   weight: "400",
-//   subsets: ["latin"],
-// });
+import { fetchData } from "../lib/fetchData";
 
 export const metadata: Metadata = {
   title: {
@@ -29,11 +14,18 @@ export const metadata: Metadata = {
   description: "Cocobod welfare application",
   applicationName: "Cocobod welfare application",
 };
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <NavLayout>{children}</NavLayout>;
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+
+  const url = `${BASE_URL}/user/me`;
+  const user: UserProps | null = await fetchData(url, accessToken);
+
+  return <NavLayout user={user}>{children}</NavLayout>;
 }

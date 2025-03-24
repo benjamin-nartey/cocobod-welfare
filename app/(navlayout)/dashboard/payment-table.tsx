@@ -1,5 +1,5 @@
 "use client";
-import { DataTable } from "@/components/data-table";
+import { DataTable } from "@/components/data-table-custom";
 import React from "react";
 import useColumns from "./columns";
 
