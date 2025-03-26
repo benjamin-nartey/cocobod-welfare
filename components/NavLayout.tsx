@@ -25,6 +25,7 @@ import {
 
 import { usePathname } from "next/navigation";
 import React from "react";
+import { UserProps } from "@/types";
 
 const isActiveStyles: string =
   "bg-white text-[#df5d29] p-4 rounded-full lg:w-[90%] md:w-fit w-[90%] max-w-full flex justify-start items-center gap-4";
@@ -34,14 +35,21 @@ const isNotActiveStyles: string =
 
 interface NavlayoutProps {
   children: React.ReactNode;
-  user: UserProps| null
+  user: UserProps | null;
+  className?: string;
 }
 
-export default function NavLayout({ children, user }: NavlayoutProps) {
+export default function NavLayout({
+  children,
+  user,
+  className,
+}: NavlayoutProps) {
   const pathname = usePathname();
-  console.log({ user });
+
   return (
-    <div className="w-screen h-screen grid lg:grid-cols-[15%_85%] md:grid-cols-[10%_90%] grid-cols-1 overflow-hidden">
+    <div
+      className={`${className} w-screen h-screen grid lg:grid-cols-[15%_85%] md:grid-cols-[10%_90%] grid-cols-1 overflow-hidden`}
+    >
       <div className="bg-[#060606] p-4 overflow-x-hidden overflow-y-scroll no-scrollbar lg:block md:block hidden">
         <div className="h-[10%] flex items-start justify-start flex-col sticky top-0 z-50 bg-inherit">
           <div className="flex gap-2 justify-start items-center bg-inherit">
@@ -160,13 +168,8 @@ export default function NavLayout({ children, user }: NavlayoutProps) {
       <div className="bg-[#ebdfd8] overflow-x-hidden overflow-y-scroll no-scrollbar">
         <div className="w-full border-b border-b-[#d3b8aa]/50 sticky top-0 z-[99] bg-inherit50 bg-inherit">
           <div className="w-full h-full flex lg:justify-between md:justify-around justify-between items-center lg:p-8 md:p-4 p-2">
-            <div className="lg:block md:block hidden">
-              <h1 className="lg:text-2xl md:text-2xl text-sm font-medium- text-[#524946] capitalize">
-                {pathname.replaceAll(/[/\-]/g, " ")}
-              </h1>
-            </div>
-            <div className="flex justify-around items-center gap-2 lg:w-auto md:w-auto w-full">
-              <div className="bg-white p-1 rounded-3xl lg:w-[25rem] md:w-[20rem] w-[12rem]">
+            <div className="flex justify-between items-center gap-2  w-full">
+              <div className="bg-white p-1 rounded-3xl lg:w-[30rem] md:w-[25rem] w-[20rem]">
                 <form
                   role="search"
                   className="flex items-center justify-center"
@@ -184,22 +187,24 @@ export default function NavLayout({ children, user }: NavlayoutProps) {
                   />
                 </form>
               </div>
-              <Badge className="bg-white rounded-full w-10 h-10 grid place-items-center hover:bg-white p-2">
-                <IoIosNotificationsOutline className="text-[#524946] h-[1.3rem] w-[1.3rem]" />
-              </Badge>
-              <div className="lg:flex md:flex hidden items-center justify-center bg-white p-2 gap-2 rounded-3xl">
-                <div className="w-8 h-8 rounded-full bg-[#c9bab2] grid  place-items-center">
-                  <User2Icon />
+              <div className="flex justify-start items-center gap-2">
+                <Badge className="bg-white rounded-full w-10 h-10 grid place-items-center hover:bg-white p-2">
+                  <IoIosNotificationsOutline className="text-[#524946] h-[1.3rem] w-[1.3rem]" />
+                </Badge>
+                <div className="lg:flex md:flex hidden items-center justify-center bg-white p-2 gap-2 rounded-3xl">
+                  <div className="w-8 h-8 rounded-full bg-[#c9bab2] grid  place-items-center">
+                    <User2Icon />
+                  </div>
+                  <div className="flex flex-col justify-start items-start">
+                    <span className="text-xs">{user?.name}</span>
+                    <span className="text-xs text-gray-400">
+                      {user && user.email}
+                    </span>
+                  </div>
+                  <Button className="w-8 h-8 hover:bg-transparent bg-white grid place-items-center rounded-full ">
+                    <ChevronDown className="text-[#524946]" />
+                  </Button>
                 </div>
-                <div className="flex flex-col justify-start items-start">
-                  <span className="text-xs">{user?.name}</span>
-                  <span className="text-xs text-gray-400">
-                    {user?.signature?.member?.user?.designation?.name}
-                  </span>
-                </div>
-                <Button className="w-8 h-8 hover:bg-transparent bg-white grid place-items-center rounded-full ">
-                  <ChevronDown className="text-[#524946]" />
-                </Button>
               </div>
 
               <Sheet>
@@ -234,7 +239,7 @@ export default function NavLayout({ children, user }: NavlayoutProps) {
                       </div>
                     </div>
                   </SheetHeader>
-                  <div className="mt-16 flex flex-col justify-between bg-red-500">
+                  <div className="mt-16 flex flex-col justify-between ">
                     <nav className="flex flex-col w-full gap-2">
                       <Link
                         href="/"
@@ -331,7 +336,9 @@ export default function NavLayout({ children, user }: NavlayoutProps) {
                   </div>
                   <SheetFooter className="justify-self-end">
                     <SheetClose asChild>
-                      <Button>Logout</Button>
+                      <Button className="bg-orangeAccent hover:bg-orangeAccent/75">
+                        Logout
+                      </Button>
                     </SheetClose>
                   </SheetFooter>
                 </SheetContent>

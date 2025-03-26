@@ -15,6 +15,7 @@ interface DepartmentProps {
   name: string;
   createdAt: Date;
   updatedAt: Date;
+  loanType?: string;
 }
 
 interface LoginProps {

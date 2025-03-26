@@ -2,7 +2,6 @@
 import React from "react";
 import { DataTableDefault } from "@/components/table";
 import useColumns from "./columns";
-import { AllLoanRequestProps } from "@/types";
 
 interface PendingLoansTableProps {
   data: AllLoanRequestProps[];

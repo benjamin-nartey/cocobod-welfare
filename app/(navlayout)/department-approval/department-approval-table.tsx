@@ -3,6 +3,7 @@
 import React from "react";
 import useColumns from "./columns";
 import { DataTableDefault } from "@/components/table";
+import { DepartmentProps } from "@/types";
 
 interface DepartmentApprovalTableProps {
   data: DepartmentProps[];

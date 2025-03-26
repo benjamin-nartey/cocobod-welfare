@@ -3,7 +3,7 @@ export const LoanType = [
   "RENT",
   "MOTOR",
   "EDUCATION",
-  " CAR_REPAIRS",
+  "CAR_REPAIRS",
   "MOTOR_REPAIRS",
   "HOME_OWNERSHIP",
   "HOUSEHOLD_DURABLES",

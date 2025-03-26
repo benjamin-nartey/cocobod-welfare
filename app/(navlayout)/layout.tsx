@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { Toaster } from "@/components/ui/sonner";
 
 import "../globals.css";
 
 import NavLayout from "@/components/NavLayout";
 import { fetchData } from "../../lib/fetchData";
+import { UserProps } from "@/types";
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  style: "normal",
+  weight: "400",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -27,5 +36,10 @@ export default async function DashboardLayout({
   const url = `${BASE_URL}/user/me`;
   const user: UserProps | null = await fetchData(url, accessToken);
 
-  return <NavLayout user={user}>{children}</NavLayout>;
+  return (
+    <NavLayout className={`${poppins.className}  antialiased`}   user={user}>
+      {children}
+      <Toaster />
+    </NavLayout>
+  );
 }

@@ -64,39 +64,46 @@ export default function RequestLoanForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Select required name="loanType">
-        <SelectTrigger className="w-[180px] rounded-3xl focus-within:ring-transparent focus-visible:ring-transparent">
-          <SelectValue placeholder="Select loan type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Loan types</SelectLabel>
-            {LoanType.map((loan, id) => (
-              <SelectItem key={id} value={loan}>
-                {loan}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+    <div className="w-full bg-[#f1ebe6] h-[70vh] p-4 rounded-3xl">
+      <form
+        className="flex flex-col justify-between h-full "
+        onSubmit={handleSubmit}
+      >
+        <div>
+          <Select required name="loanType">
+            <SelectTrigger className="w-[180px] rounded-3xl focus-within:ring-transparent focus-visible:ring-transparent">
+              <SelectValue placeholder="Select loan type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Loan types</SelectLabel>
+                {LoanType.map((loan, id) => (
+                  <SelectItem className="capitalize" key={id} value={loan}>
+                    {loan.replace("_", " ").toLowerCase()}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
-      <div className="grid gap-2 mt-20">
-        <Textarea
-          className="bg-[#f1ebe6]"
-          rows={10}
-          placeholder="Type your message here."
-          name="comments"
-        />
-        <span className="text-sm text-red-500 mt-1">{errMsg}</span>
-        <Button
-          className="mt-8 bg-orangeAccent hover:bg-orangeAccent/75"
-          type="submit"
-        >
-          {loading && <Spinner variant="small" />}
-          {loading ? "Submiting..." : "Submit"}
-        </Button>
-      </div>
-    </form>
+        <div className="flex flex-col">
+          <Textarea
+            className="bg-[#fff] rounded-3xl p-4"
+            rows={10}
+            placeholder="Add your comments here..."
+            name="comments"
+          />
+          <span className="text-sm text-red-500 mt-1">{errMsg}</span>
+          <Button
+            className="mt-8 bg-orangeAccent hover:bg-orangeAccent/75"
+            type="submit"
+          >
+            {loading && <Spinner variant="small" />}
+            {loading ? "Submiting..." : "Submit"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
