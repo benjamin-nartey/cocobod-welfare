@@ -1,6 +1,6 @@
 import React from "react";
 import PendingLoansTable from "./pending-loans-table";
-import { fetchData } from "@/app/lib/fetchData";
+import { fetchData } from "@/lib/fetchData";
 import { cookies } from "next/headers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;

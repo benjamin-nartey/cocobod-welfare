@@ -1,3 +1,8 @@
+import {
+  EmployeeTypeEnum,
+  EmployeeStatusEnum,
+  LoanTypeEnum,
+} from "./lib/constants/enums";
 interface PaymentProps {
   id: string;
   amount: number;
@@ -33,16 +38,6 @@ interface TokensProps {
 
 interface RoleProps extends GenericAttributeProps {
   permissions: GenericAttributeProps[];
-}
-
-enum EmployeeTypeEnum {
-  JUNIOR = "JUNIOR",
-  SENIOR = "SENIOR",
-  MANAGEMENT = "MANAGEMENT",
-}
-enum EmployeeStatusEnum {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
 }
 
 interface UserEmployeeProps {
@@ -136,4 +131,17 @@ interface LoansRequestProps {
 interface LoanRequestByDepartmentProps {
   loanType: string;
   departments: DepartmentProps[];
+}
+
+interface LoanProps {
+  loanType:
+    | LoanTypeEnum.CAR
+    | LoanTypeEnum.CAR_REPAIRS
+    | LoanTypeEnum.EDUCATION
+    | LoanTypeEnum.HOME_OWNERSHIP
+    | LoanTypeEnum.HOUSEHOLD_DURABLES
+    | LoanTypeEnum.MOTOR
+    | LoanTypeEnum.MOTOR_REPAIRS
+    | LoanTypeEnum.RENT;
+  comments?: string;
 }

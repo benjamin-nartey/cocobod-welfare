@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import "../globals.css";
 
 import NavLayout from "@/components/NavLayout";
-import { fetchData } from "../lib/fetchData";
+import { fetchData } from "../../lib/fetchData";
 
 export const metadata: Metadata = {
   title: {
