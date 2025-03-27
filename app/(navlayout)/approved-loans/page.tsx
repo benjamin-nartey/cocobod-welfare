@@ -1,44 +1,34 @@
 import React from "react";
 import PendingLoansTable from "./pending-loans-table";
 import { cookies } from "next/headers";
-import { AllLoanRequestProps } from "@/types";
+import { LoansRequestProps } from "@/types";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-type Params = {
-  params: {
-    id: string;
-    loanType: string;
-  };
-};
-
-export default async function PendingLoansDepartments(Params: Params) {
-  const param = await Params.params;
-  const { id, loanType } = param;
+export default async function PendingLoansDepartments() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
-  console.log({ id });
-  console.log(typeof loanType);
+  const params = new URLSearchParams();
+  params.append("status", "SIGNED");
 
-  const loanUrl = `${BASE_URL}/loans/department/${id}`;
+  const loanUrl = `${BASE_URL}/loans?${params}`;
 
   const response = await fetch(loanUrl as string, {
-    method: "POST",
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
     },
-    body: JSON.stringify({ loanType }),
   });
 
-  const loanRequests = (await response.json()) as AllLoanRequestProps[];
+  const loanRequests = (await response.json()) as LoansRequestProps;
 
   console.log({ loanRequests });
 
   return (
     <div className="w-full bg-[#f1ebe6] rounded-3xl p-2">
-      <PendingLoansTable data={loanRequests} />
+      <PendingLoansTable data={loanRequests.data} />
     </div>
   );
 }

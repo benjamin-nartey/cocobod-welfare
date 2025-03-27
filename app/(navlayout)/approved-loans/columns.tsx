@@ -2,9 +2,8 @@
 
 import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
-// import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-// import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AllLoanRequestProps } from "@/types";
-import { MoreHorizontal } from "lucide-react";
 
 const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
   return [

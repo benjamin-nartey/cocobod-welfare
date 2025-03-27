@@ -41,7 +41,7 @@ export default function RequestLoanForm() {
       }
       const TokeResponse = await fetch("/api/get-cookie?name=accessToken");
       const accessToken = await TokeResponse.json();
-      console.log({ accessToken });
+
       const response = await fetch(`${BASE_URL}/loans`, {
         method: "POST",
         headers: {

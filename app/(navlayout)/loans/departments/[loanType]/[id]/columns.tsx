@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { FormEvent, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,35 +12,40 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AllLoanRequestProps } from "@/types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
+  const [selectedLoan, setSelectedLoan] = useState<AllLoanRequestProps | null>(
+    null
+  );
+
+  const [isOpenAlertDialog, setIsOpenAlertDialog] = useState<boolean>(false);
+  const [selectedAction, setSelectedAction] = useState<string>("");
+  const [comments, setComments] = useState("");
+
+  const handleApproveClick = (loan: AllLoanRequestProps, action: string) => {
+    setSelectedLoan(loan);
+    setSelectedAction(action);
+
+    setIsOpenAlertDialog(true);
+  };
+
+  console.log({ comments });
   return [
-    // {
-    //   accessorKey: "status",
-    //   header: "Status",
-    //   cell: ({ row }) => {
-    //     const status = row.getValue("status") as string;
-
-    //     const getStatusStyles = (status: string) => {
-    //       switch (status.toLowerCase()) {
-    //         case "success":
-    //           return "bg-green-100 text-green-800 px-3 py-1 rounded-full";
-    //         case "processing":
-    //           return "bg-amber-100 text-amber-800 px-3 py-1 rounded-full";
-    //         case "failed":
-    //           return "bg-red-100 text-red-800 px-3 py-1 rounded-full";
-    //         default:
-    //           return "bg-gray-100 text-gray-800 px-3 py-1 rounded-full";
-    //       }
-    //     };
-
-    //     return (
-    //       <div className={`inline-block capitalize ${getStatusStyles(status)}`}>
-    //         {status}
-    //       </div>
-    //     );
-    //   },
-    // },
     {
       accessorKey: "employeeName",
       header: () => <div className="">Name</div>,
@@ -122,50 +126,114 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
       },
     },
 
-    // {
-    //   header: "Action",
-    //   id: "actions",
-    //   cell: ({ row }) => {
-    //     // const id = row.original;
-
-    //     return (
-    //       <div className="flex justify-start items-center gap-2">
-    //         <Button className="bg-orangeAccent text-white hover:bg-orangeAccent/75">
-    //           View
-    //         </Button>
-    //         <Button className="bg-green-800 text-white hover:bg-green-800/75">Approve all</Button>
-    //       </div>
-    //     );
-    //   },
-    // },
     {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
-        const loanRequests = row.original;
+        const loan = row.original;
+
+        const handleApprove = async (loanId: string, action: string) => {
+          try {
+            const payload = {
+              action,
+            };
+
+            const TokeResponse = await fetch(
+              "/api/get-cookie?name=accessToken"
+            );
+            const accessToken = await TokeResponse.json();
+
+            await fetch(`${BASE_URL}/loans/${loanId}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken?.value}`,
+              },
+              body: JSON.stringify(
+                payload.action === "SIGNED" ? payload : { ...payload, comments }
+              ),
+            });
+            toast("Loan approved successfully");
+          } catch (error) {
+            console.log(error);
+          }
+        };
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => console.log(loanRequests.loanType)}
-              >
-                Approve
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
-                Reject
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <>
+            <AlertDialog
+              open={isOpenAlertDialog}
+              onOpenChange={setIsOpenAlertDialog}
+            >
+              <AlertDialogContent className="bg-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {selectedAction === "SIGNED"
+                      ? `Are you sure you want approve the ${selectedLoan?.loanType
+                          .replaceAll("_", " ")
+                          .toLowerCase()} loan requested by ${
+                          selectedLoan?.employee?.user?.name
+                        }?. Once approved cannot be undone at this stage`
+                      : `Clicking on review will forward this request back to ${selectedLoan?.employee?.user?.name} for a review. You can choose to add your comment below`}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                {selectedAction === "REVIEW" && (
+                  <div>
+                    <Textarea
+                      className="bg-[#fff] rounded-3xl p-4 focus:outline-none focus:ring-0"
+                      rows={6}
+                      placeholder="Add your comments here..."
+                      name="comments"
+                      onChange={(event) => setComments(event.target.value)}
+                    />
+                  </div>
+                )}
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="text-white bg-orangeAccent hover:bg-orangeAccent/75"
+                    onClick={() => {
+                      if (selectedLoan) {
+                        handleApprove(
+                          loan.id,
+                          `${selectedAction === "SIGNED" ? "SIGNED" : "REVIEW"}`
+                        );
+                        setIsOpenAlertDialog(false);
+                      }
+                    }}
+                  >
+                    {selectedAction === "SIGNED" ? "Approve" : "Review"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => handleApproveClick(loan, "SIGNED")}
+                >
+                  Approve
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => handleApproveClick(loan, "REVIEW")}
+                >
+                  Review
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
         );
       },
     },
