@@ -3,11 +3,10 @@ import {
   EmployeeStatusEnum,
   LoanTypeEnum,
 } from "./lib/constants/enums";
-interface PaymentProps {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
+
+interface NewTokensProps {
+  accessToken: string;
+  refreshToken: string;
 }
 
 interface DepartmentProps {

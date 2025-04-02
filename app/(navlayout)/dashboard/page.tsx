@@ -15,48 +15,38 @@ import React from "react";
 // import { FaBalanceScale } from "react-icons/fa";
 import { LuChartNoAxesCombined } from "react-icons/lu";
 import { SlBriefcase } from "react-icons/sl";
-import PaymentTable from "./payment-table";
+
 import { RadialChartComponent } from "@/components/RadialChart";
+
+import { cookies } from "next/headers";
+import { LoansRequestProps } from "@/types";
+import RecentlyApprovedLoanTable from "./recently-approved-loans";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "COCOBOD welfare Dashboard",
 };
 
-const data: PaymentProps[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@yahoo.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@gmail.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@gmail.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@gmail.com",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@hotmail.com",
-  },
-];
+export default async function Dashboard() {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
 
-export default function Dashboard() {
+  const params = new URLSearchParams();
+  params.append("status", "SIGNED");
+
+  const loanUrl = `${BASE_URL}/loans?${params}`;
+
+  const response = await fetch(loanUrl as string, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const loanRequests = (await response.json()) as LoansRequestProps;
   return (
     <>
       <div className="w-full flex justify-between items-center">
@@ -98,37 +88,15 @@ export default function Dashboard() {
             <SlBriefcase size={25} className="text-white" />
           </MetricCard>
         </Link>
-
-        {/* <Link className="w-full" href="/time-log">
-          <MetricCard
-            color="bg-[#719ddc]"
-            title="Time spent"
-            dataValue="122 Hrs"
-            trend="12% increase from last month"
-          >
-            <Clock size={25} className="text-white" />
-          </MetricCard>
-        </Link> */}
-
-        {/* <Link className="w-full" href="/resources">
-          <MetricCard
-            color="bg-[#f0c075]"
-            title="Resources"
-            dataValue="101"
-            trend="12% increase from last month"
-          >
-            <FaBalanceScale size={25} className="text-white" />
-          </MetricCard>
-        </Link> */}
       </div>
 
       <div className="w-full mt-4 flex lg:flex-row md:flex-col flex-col justify-between items-start gap-4">
         <div className="lg:w-[60%] md:w-full w-full">
           <div className="p-4 bg-[#f1ebe6] rounded-2xl">
             <div className="flex justify-between mb-2">
-              <span className="font-bold">Payment summary</span>
+              <span className="font-bold">Recently approved loans</span>
             </div>
-            <PaymentTable data={data} />
+            <RecentlyApprovedLoanTable data={loanRequests.data} />
           </div>
         </div>
         <div className="lg:w-[37%] md:w-full w-full bg-[#f1ebe6] rounded-2xl p-2">

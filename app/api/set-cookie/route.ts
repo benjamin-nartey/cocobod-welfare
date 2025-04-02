@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
     const accessTokenCookie = serialize("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 7, // 1 week
       sameSite: "strict",
       path: "/",
     });
@@ -20,7 +19,6 @@ export async function POST(req: NextRequest) {
     const refreshTokenCookie = serialize("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 30, // 1 month
       sameSite: "strict",
       path: "/",
     });

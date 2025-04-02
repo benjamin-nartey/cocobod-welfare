@@ -9,7 +9,10 @@ export const fetchData = async <T>(
       },
     });
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      const data = await response.json();
+      if (data?.statusCode === 401) {
+        throw new Error("Network response was not ok");
+      }
     }
     return response.json();
   } catch (error) {

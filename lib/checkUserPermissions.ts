@@ -1,11 +1,16 @@
 import { UserProps } from "@/types";
 
-export function checkUserPermission(user: UserProps, allowedPermission: string): boolean {
-    // Iterate through each role of the user
-    return user.roles.some(role => 
-      // Check if any role has a permission matching the allowed permission
-      role.permissions.some(permission => 
-        permission.name === allowedPermission
-      )
-    );
-  }
+export function checkUserPermission(
+  user: UserProps,
+  allowedPermissions: string | string[]
+): boolean {
+  const permissionsToCheck = Array.isArray(allowedPermissions)
+    ? allowedPermissions
+    : [allowedPermissions];
+
+  return user.roles.some((role) =>
+    role.permissions.some((permission) =>
+      permissionsToCheck.includes(permission.name)
+    )
+  );
+}

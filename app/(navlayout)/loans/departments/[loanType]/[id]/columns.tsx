@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FormEvent, useState } from "react";
+import React, {  useRef, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -36,6 +37,9 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
   const [isOpenAlertDialog, setIsOpenAlertDialog] = useState<boolean>(false);
   const [selectedAction, setSelectedAction] = useState<string>("");
   const [comments, setComments] = useState("");
+  const [loading, setLoading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter()
 
   const handleApproveClick = (loan: AllLoanRequestProps, action: string) => {
     setSelectedLoan(loan);
@@ -133,43 +137,57 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
         const loan = row.original;
 
         const handleApprove = async (loanId: string, action: string) => {
+          setLoading(true);
           try {
+            const currentComments = textareaRef.current?.value || "";
+            setComments(currentComments);
+
             const payload = {
               action,
             };
+            console.log({ payload });
 
             const TokeResponse = await fetch(
               "/api/get-cookie?name=accessToken"
             );
             const accessToken = await TokeResponse.json();
 
-            await fetch(`${BASE_URL}/loans/${loanId}`, {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken?.value}`,
-              },
-              body: JSON.stringify(
-                payload.action === "SIGNED" ? payload : { ...payload, comments }
-              ),
-            });
-            toast("Loan approved successfully");
+            const response = await fetch(
+              `${BASE_URL}/loans/approve/${loanId}`,
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${accessToken?.value}`,
+                },
+                body: JSON.stringify(
+                  payload.action === "APPROVE"
+                    ? payload
+                    : { ...payload, comments: currentComments }
+                ),
+              }
+            );
+
+            if (response.ok) {
+              toast("Loan approved successfully");
+              setIsOpenAlertDialog(false);
+              router.refresh();
+            }
           } catch (error) {
             console.log(error);
+          } finally {
+            setLoading(false);
           }
         };
 
         return (
           <>
-            <AlertDialog
-              open={isOpenAlertDialog}
-              onOpenChange={setIsOpenAlertDialog}
-            >
+            <AlertDialog open={isOpenAlertDialog}>
               <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    {selectedAction === "SIGNED"
+                    {selectedAction === "APPROVE"
                       ? `Are you sure you want approve the ${selectedLoan?.loanType
                           .replaceAll("_", " ")
                           .toLowerCase()} loan requested by ${
@@ -185,25 +203,35 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
                       rows={6}
                       placeholder="Add your comments here..."
                       name="comments"
-                      onChange={(event) => setComments(event.target.value)}
+                      ref={textareaRef}
                     />
                   </div>
                 )}
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel
+                    onClick={() => setIsOpenAlertDialog(false)}
+                  >
+                    Cancel
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     className="text-white bg-orangeAccent hover:bg-orangeAccent/75"
                     onClick={() => {
                       if (selectedLoan) {
                         handleApprove(
                           loan.id,
-                          `${selectedAction === "SIGNED" ? "SIGNED" : "REVIEW"}`
+                          `${
+                            selectedAction === "APPROVE" ? "APPROVE" : "REVIEW"
+                          }`
                         );
-                        setIsOpenAlertDialog(false);
                       }
                     }}
+                    disabled={loading}
                   >
-                    {selectedAction === "SIGNED" ? "Approve" : "Review"}
+                    {loading
+                      ? "Processing..."
+                      : selectedAction === "APPROVE"
+                      ? "Approve"
+                      : "Review"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -220,7 +248,7 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() => handleApproveClick(loan, "SIGNED")}
+                  onClick={() => handleApproveClick(loan, "APPROVE")}
                 >
                   Approve
                 </DropdownMenuItem>

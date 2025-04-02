@@ -18,9 +18,6 @@ export default async function PendingLoansDepartments(Params: Params) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
-  console.log({ id });
-  console.log(typeof loanType);
-
   const loanUrl = `${BASE_URL}/loans/department/${id}`;
 
   const response = await fetch(loanUrl as string, {
@@ -33,8 +30,6 @@ export default async function PendingLoansDepartments(Params: Params) {
   });
 
   const loanRequests = (await response.json()) as AllLoanRequestProps[];
-
-  console.log({ loanRequests });
 
   return (
     <div className="w-full bg-[#f1ebe6] rounded-3xl p-2">

@@ -21,6 +21,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import {
   Table,
   TableBody,
   TableCell,
@@ -36,7 +42,11 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  File,
+  FilterIcon,
 } from "lucide-react";
+import { Checkbox } from "./ui/checkbox";
+import { exportToExcel } from "@/lib/exportToExcel";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,6 +56,8 @@ interface DataTableProps<TData, TValue> {
   isOpenAddVisitor?: boolean;
   isOpenEditVisitor?: boolean;
   withSearchFilter?: boolean;
+  withExcelExport?: boolean;
+  exportFileName?: string; // Add
 }
 
 export function DataTableDefault<TData, TValue>({
@@ -55,6 +67,8 @@ export function DataTableDefault<TData, TValue>({
   drawalEditComponent,
   isOpenEditVisitor,
   withSearchFilter,
+  withExcelExport,
+  exportFileName = "loan-report",
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -82,16 +96,123 @@ export function DataTableDefault<TData, TValue>({
     },
   });
 
+  // const handleExport = (): void => {
+  //   // Use the exportFileName prop
+  //   exportToExcel(data, exportFileName.toLowerCase().replace(/\s+/g, "-"));
+  // };
+
+  // const handleExport = (): void => {
+  //   try {
+  //     // Get all current rows based on sorting, filtering, etc.
+  //     const rows = table.getRowModel().rows;
+
+  //     // Map to just the original data objects
+  //     const dataToExport = rows.map(row => row.original);
+
+  //     // Debug what's being exported
+  //     console.log('Exporting data:', dataToExport);
+
+  //     // Use a simple file name
+  //     const fileName = 'table-export';
+
+  //     // Call the export function
+  //     exportToExcel(dataToExport, fileName);
+  //   } catch (error) {
+  //     console.error('Error in handleExport:', error);
+  //   }
+  // };
+
+  const handleExport = (): void => {
+    try {
+      // Get the current data based on filters
+      const dataToExport = table
+        .getFilteredRowModel()
+        .rows.map((row) => row.original);
+
+      // Call the export function with the proper file name
+      exportToExcel(dataToExport, exportFileName || "loan-requests");
+    } catch (error) {
+      console.error("Error in handleExport:", error);
+    }
+  };
+
   return (
     <>
-      <div className="flex items-center gap-2 ">
+      <div className="flex items-center justify-between gap-2 mb-2">
         {withSearchFilter && (
-          <Input
-            placeholder="Filter Name..."
-            value={(table.getState()?.globalFilter as string) ?? ""}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="max-w-sm bg-white shadow-sm rounded-3xl"
-          />
+          <div>
+            <Input
+              placeholder="Filter Name..."
+              value={(table.getState()?.globalFilter as string) ?? ""}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              className="max-w-sm bg-white shadow-sm rounded-3xl"
+            />
+          </div>
+        )}
+
+        {withExcelExport && (
+          <div className="flex justify-center items-center gap-4 mr-2">
+            <Popover>
+              <PopoverTrigger>
+                <FilterIcon className="text-zinc-400 hover:text-orangeAccent cursor-pointer" />
+              </PopoverTrigger>
+              <PopoverContent>
+                <form>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox className="" id="terms" />
+                      <label
+                        htmlFor="terms"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Approved
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox className="" id="terms" />
+                      <label
+                        htmlFor="terms"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        pending
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox className="" id="terms" />
+                      <label
+                        htmlFor="terms"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Review
+                      </label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox className="" id="terms" />
+                      <label
+                        htmlFor="terms"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Department
+                      </label>
+                    </div>
+                    <Button
+                      className="bg-orangeAccent hover:bg-orangeAccent/75"
+                      type="submit"
+                    >
+                      Filter
+                    </Button>
+                  </div>
+                </form>
+              </PopoverContent>
+            </Popover>
+            <Button
+              onClick={handleExport}
+              className="bg-zinc-400 hover:bg-orangeAccent"
+              type="button"
+            >
+              <File /> Export to excel
+            </Button>
+          </div>
         )}
 
         {/* <DropdownMenu>

@@ -1,10 +1,9 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Search, Settings, User2Icon } from "lucide-react";
+import { ChevronDown, Search, User2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaBalanceScale, FaUsers } from "react-icons/fa";
 import { GrTask } from "react-icons/gr";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuClock8 } from "react-icons/lu";
@@ -26,6 +25,7 @@ import {
 import { usePathname } from "next/navigation";
 import React from "react";
 import { UserProps } from "@/types";
+import { checkUserPermission } from "@/lib/checkUserPermissions";
 
 const isActiveStyles: string =
   "bg-white text-[#df5d29] p-4 rounded-full lg:w-[90%] md:w-fit w-[90%] max-w-full flex justify-start items-center gap-4";
@@ -46,6 +46,8 @@ export default function NavLayout({
 }: NavlayoutProps) {
   const pathname = usePathname();
 
+  user?.roles.some((role) => console.log(role.name));
+
   return (
     <div
       className={`${className} w-screen h-screen grid lg:grid-cols-[15%_85%] md:grid-cols-[10%_90%] grid-cols-1 overflow-hidden`}
@@ -63,16 +65,6 @@ export default function NavLayout({
               </span>
             </div>
           </div>
-          {/* <div className="w-full">
-            <button className="bg-white text-black lg:p-[0.5rem] md:p-2 p-1 rounded-full lg:w-[90%] md:w-fit w-full hover:bg-[#d4cdcd] flex justify-start items-center gap-2">
-              <div className="flex-[0.17]">
-                <FaMoneyCheckDollar size={25} className="text-[#df5d29] " />
-              </div>
-              <span className="whitespace-normal text-left flex-1 lg:block md:hidden block">
-                Request Loan
-              </span>
-            </button>
-          </div> */}
         </div>
 
         <div className="py-16">
@@ -88,85 +80,69 @@ export default function NavLayout({
                 Dashboard
               </span>
             </Link>
-            <Link
-              href="/request-loan"
-              className={
-                pathname === "/request-loan"
-                  ? isActiveStyles
-                  : isNotActiveStyles
-              }
-            >
-              <SlBriefcase size={20} className="" />
-              <span className="lg:inline-block md:hidden inline-block">
-                Req. loan
-              </span>
-            </Link>
-            <Link
-              href="/department-approval"
-              className={
-                pathname === "/department-approval"
-                  ? isActiveStyles
-                  : isNotActiveStyles
-              }
-            >
-              <GrTask size={20} className="" />
-              <span className="lg:inline-block md:hidden inline-block">
-                Dep. approval
-              </span>
-            </Link>
-            <Link
-              href="/time-log"
-              className={
-                pathname === "/time-log" ? isActiveStyles : isNotActiveStyles
-              }
-            >
-              <LuClock8 size={20} className="" />
-              <span className="lg:inline-block md:hidden inline-block">
-                Time log
-              </span>
-            </Link>
-            <Link
-              href="/resource-mgt"
-              className={
-                pathname === "/resource-mgt"
-                  ? isActiveStyles
-                  : isNotActiveStyles
-              }
-            >
-              <FaBalanceScale size={20} className="" />
-              <span className="lg:inline-block md:hidden inline-block">
-                Resource mgt
-              </span>
-            </Link>
-            <Link
-              href="/users"
-              className={
-                pathname === "/users" ? isActiveStyles : isNotActiveStyles
-              }
-            >
-              <FaUsers size={20} className="" />
-              <span className="lg:inline-block md:hidden inline-block">
-                Users
-              </span>
-            </Link>
-            <Link
-              href="/configurations"
-              className={
-                pathname === "/configurations"
-                  ? isActiveStyles
-                  : isNotActiveStyles
-              }
-            >
-              <Settings size={20} className="" />
-              <span className="lg:inline-block md:hidden inline-block">
-                Configurations
-              </span>
-            </Link>
+            {user?.roles.some(
+              (role) =>
+                role.name === "User" &&
+                checkUserPermission(user, "request_loan")
+            ) && (
+              <Link
+                href="/request-loan"
+                className={
+                  pathname === "/request-loan"
+                    ? isActiveStyles
+                    : isNotActiveStyles
+                }
+              >
+                <SlBriefcase size={20} className="" />
+                <span className="lg:inline-block md:hidden inline-block">
+                  Req. loan
+                </span>
+              </Link>
+            )}
+            {user?.roles.some(
+              (role) =>
+                role.name === "Director HR" &&
+                checkUserPermission(user, "get_loans")
+            ) && (
+              <Link
+                href="/department-approval"
+                className={
+                  pathname === "/department-approval"
+                    ? isActiveStyles
+                    : isNotActiveStyles
+                }
+              >
+                <GrTask size={20} className="" />
+                <span className="lg:inline-block md:hidden inline-block">
+                  Dep. approval
+                </span>
+              </Link>
+            )}
+            {user?.roles.some(
+              (role) =>
+                [
+                  "Director HR",
+                  "Welfare Manager",
+                  "Head of Department",
+                ].includes(role.name) && checkUserPermission(user, "get_loans")
+            ) && (
+              <Link
+                href="/reports"
+                className={
+                  pathname === "/reports" ? isActiveStyles : isNotActiveStyles
+                }
+              >
+                <LuClock8 size={20} className="" />
+                <span className="lg:inline-block md:hidden inline-block">
+                  Reports
+                </span>
+              </Link>
+            )}
           </nav>
         </div>
       </div>
       <div className="bg-[#ebdfd8] overflow-x-hidden overflow-y-scroll no-scrollbar">
-        <div className="w-full border-b border-b-[#d3b8aa]/50 sticky top-0 z-[99] bg-inherit50 bg-inherit">
+        <div className="w-full border-b border-b-[#d3b8aa]/50 sticky top-0 z-[80] bg-inherit50 bg-inherit">
           <div className="w-full h-full flex lg:justify-between md:justify-around justify-between items-center lg:p-8 md:p-4 p-2">
             <div className="flex justify-between items-center gap-2  w-full">
               <div className="bg-white p-1 rounded-3xl lg:w-[30rem] md:w-[25rem] w-[20rem]">
@@ -242,7 +218,7 @@ export default function NavLayout({
                   <div className="mt-16 flex flex-col justify-between ">
                     <nav className="flex flex-col w-full gap-2">
                       <Link
-                        href="/"
+                        href="/dashboard"
                         className={
                           pathname === "/dashboard"
                             ? isActiveStyles
@@ -255,88 +231,49 @@ export default function NavLayout({
                         </span>
                       </Link>
                       <Link
-                        href="/projects"
+                        href="/request-loan"
                         className={
-                          pathname === "/projects"
+                          pathname === "/request-loan"
                             ? isActiveStyles
                             : isNotActiveStyles
                         }
                       >
                         <SlBriefcase size={20} className="" />
                         <span className="lg:inline-block md:hidden inline-block">
-                          Projects
+                          Request loan
                         </span>
                       </Link>
                       <Link
-                        href="/tasks"
+                        href="/department-approval"
                         className={
-                          pathname === "/tasks"
+                          pathname === "/department-approval"
                             ? isActiveStyles
                             : isNotActiveStyles
                         }
                       >
                         <GrTask size={20} className="" />
                         <span className="lg:inline-block md:hidden inline-block">
-                          Tasks
+                          Department approval
                         </span>
                       </Link>
                       <Link
-                        href="/time-log"
+                        href="/reports"
                         className={
-                          pathname === "/time-log"
+                          pathname === "/reports"
                             ? isActiveStyles
                             : isNotActiveStyles
                         }
                       >
                         <LuClock8 size={20} className="" />
                         <span className="lg:inline-block md:hidden inline-block">
-                          Time log
-                        </span>
-                      </Link>
-                      <Link
-                        href="/resource-mgt"
-                        className={
-                          pathname === "/resource-mgt"
-                            ? isActiveStyles
-                            : isNotActiveStyles
-                        }
-                      >
-                        <FaBalanceScale size={20} className="" />
-                        <span className="lg:inline-block md:hidden inline-block">
-                          Resource mgt
-                        </span>
-                      </Link>
-                      <Link
-                        href="/users"
-                        className={
-                          pathname === "/users"
-                            ? isActiveStyles
-                            : isNotActiveStyles
-                        }
-                      >
-                        <FaUsers size={20} className="" />
-                        <span className="lg:inline-block md:hidden inline-block">
-                          Users
-                        </span>
-                      </Link>
-                      <Link
-                        href="/configurations"
-                        className={
-                          pathname === "/configurations"
-                            ? isActiveStyles
-                            : isNotActiveStyles
-                        }
-                      >
-                        <Settings size={20} className="" />
-                        <span className="lg:inline-block md:hidden inline-block">
-                          Configurations
+                          Reports
                         </span>
                       </Link>
                     </nav>
                   </div>
                   <SheetFooter className="justify-self-end">
                     <SheetClose asChild>
-                      <Button className="bg-orangeAccent hover:bg-orangeAccent/75">
+                      <Button className="bg-orangeAccent hover:bg-orangeAccent/75 w-full">
                         Logout
                       </Button>
                     </SheetClose>

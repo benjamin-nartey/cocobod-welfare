@@ -23,15 +23,4 @@ export default function RequestLoan() {
   );
 }
 
-// import React from 'react';
-// import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
-// const App = () => {
-//   return (
-//     <DotLottieReact
-//       src="https://lottie.host/c328f6d5-7b55-4237-939d-2036e3637612/La07qPyjMY.lottie"
-//       loop
-//       autoplay
-//     />
-//   );
-// };
