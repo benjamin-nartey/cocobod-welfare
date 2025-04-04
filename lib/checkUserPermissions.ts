@@ -8,7 +8,7 @@ export function checkUserPermission(
     ? allowedPermissions
     : [allowedPermissions];
 
-  return user.roles.some((role) =>
+  return user?.roles.some((role) =>
     role.permissions.some((permission) =>
       permissionsToCheck.includes(permission.name)
     )

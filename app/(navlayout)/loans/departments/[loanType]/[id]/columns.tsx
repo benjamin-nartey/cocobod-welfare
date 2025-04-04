@@ -48,7 +48,7 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
     setIsOpenAlertDialog(true);
   };
 
-  console.log({ comments });
+ 
   return [
     {
       accessorKey: "employeeName",
@@ -145,7 +145,7 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
             const payload = {
               action,
             };
-            console.log({ payload });
+            
 
             const TokeResponse = await fetch(
               "/api/get-cookie?name=accessToken"

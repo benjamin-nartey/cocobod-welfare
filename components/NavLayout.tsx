@@ -11,6 +11,8 @@ import { RxDashboard } from "react-icons/rx";
 import { SlBriefcase } from "react-icons/sl";
 import { TbMenuDeep } from "react-icons/tb";
 
+import { useRouter } from "next/navigation";
+
 import {
   Sheet,
   SheetClose,
@@ -22,10 +24,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { UserProps } from "@/types";
 import { checkUserPermission } from "@/lib/checkUserPermissions";
+import Spinner from "./Spinner";
 
 const isActiveStyles: string =
   "bg-white text-[#df5d29] p-4 rounded-full lg:w-[90%] md:w-fit w-[90%] max-w-full flex justify-start items-center gap-4";
@@ -39,14 +48,48 @@ interface NavlayoutProps {
   className?: string;
 }
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
 export default function NavLayout({
   children,
   user,
   className,
 }: NavlayoutProps) {
+  const [loading, setLoading] = useState<boolean>(false);
   const pathname = usePathname();
+  const router = useRouter();
 
-  user?.roles.some((role) => console.log(role.name));
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const TokeResponse = await fetch("/api/get-cookie?name=accessToken");
+      const accessToken = await TokeResponse.json();
+
+      const response = await fetch(`${BASE_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken?.value}`,
+        },
+      });
+
+      if (response.ok) {
+        await fetch("/api/set-cookie/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            accessToken: null,
+            refreshToken: null,
+          }),
+        });
+        router.push("/");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -146,15 +189,16 @@ export default function NavLayout({
           <div className="w-full h-full flex lg:justify-between md:justify-around justify-between items-center lg:p-8 md:p-4 p-2">
             <div className="flex justify-between items-center gap-2  w-full">
               <div className="bg-white p-1 rounded-3xl lg:w-[30rem] md:w-[25rem] w-[20rem]">
-                <form
-                  role="search"
-                  className="flex items-center justify-center"
-                >
+                <form className="flex items-center justify-center">
                   <Button
+                    role="search"
                     size="icon"
                     className=" text-gray-400 text-lg bg-tansparent hover:bg-transparent"
                   >
-                    <Search className="text-[#524946] !w-[1.3rem] !h-[1.3rem]" />
+                    <Search
+                      role="search"
+                      className="text-[#524946] !w-[1.3rem] !h-[1.3rem]"
+                    />
                   </Button>
                   <input
                     className="w-full placeholder:text-sm placeholder:font-light focus:outline-none outline-none text-base"
@@ -177,15 +221,32 @@ export default function NavLayout({
                       {user && user.email}
                     </span>
                   </div>
-                  <Button className="w-8 h-8 hover:bg-transparent bg-white grid place-items-center rounded-full ">
-                    <ChevronDown className="text-[#524946]" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="w-8 h-8 hover:bg-transparent bg-white grid place-items-center rounded-full ">
+                        <ChevronDown className="text-[#524946]" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56 z-[85] mr-4">
+                      <Button
+                        type="button"
+                        onClick={handleLogout}
+                        className="bg-orangeAccent hover:bg-orangeAccent/75 w-full"
+                      >
+                        {loading && <Spinner variant="small" />}
+                        {loading ? "Loging..." : "Logout"}
+                      </Button>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
               <Sheet>
                 <SheetTrigger asChild>
-                  <span className="lg:hidden md:hidden flex items-center justify-center text-[#df5d29]">
+                  <span
+                    role="button"
+                    className="lg:hidden md:hidden flex items-center justify-center text-[#df5d29]"
+                  >
                     <TbMenuDeep size={30} />
                   </span>
                 </SheetTrigger>
@@ -230,51 +291,78 @@ export default function NavLayout({
                           Dashboard
                         </span>
                       </Link>
-                      <Link
-                        href="/request-loan"
-                        className={
-                          pathname === "/request-loan"
-                            ? isActiveStyles
-                            : isNotActiveStyles
-                        }
-                      >
-                        <SlBriefcase size={20} className="" />
-                        <span className="lg:inline-block md:hidden inline-block">
-                          Request loan
-                        </span>
-                      </Link>
-                      <Link
-                        href="/department-approval"
-                        className={
-                          pathname === "/department-approval"
-                            ? isActiveStyles
-                            : isNotActiveStyles
-                        }
-                      >
-                        <GrTask size={20} className="" />
-                        <span className="lg:inline-block md:hidden inline-block">
-                          Department approval
-                        </span>
-                      </Link>
-                      <Link
-                        href="/reports"
-                        className={
-                          pathname === "/reports"
-                            ? isActiveStyles
-                            : isNotActiveStyles
-                        }
-                      >
-                        <LuClock8 size={20} className="" />
-                        <span className="lg:inline-block md:hidden inline-block">
-                          Reports
-                        </span>
-                      </Link>
+                      {user?.roles.some(
+                        (role) =>
+                          role.name === "User" &&
+                          checkUserPermission(user, "request_loan")
+                      ) && (
+                        <Link
+                          href="/request-loan"
+                          className={
+                            pathname === "/request-loan"
+                              ? isActiveStyles
+                              : isNotActiveStyles
+                          }
+                        >
+                          <SlBriefcase size={20} className="" />
+                          <span className="lg:inline-block md:hidden inline-block">
+                            Req. loan
+                          </span>
+                        </Link>
+                      )}
+                      {user?.roles.some(
+                        (role) =>
+                          role.name === "Director HR" &&
+                          checkUserPermission(user, "get_loans")
+                      ) && (
+                        <Link
+                          href="/department-approval"
+                          className={
+                            pathname === "/department-approval"
+                              ? isActiveStyles
+                              : isNotActiveStyles
+                          }
+                        >
+                          <GrTask size={20} className="" />
+                          <span className="lg:inline-block md:hidden inline-block">
+                            Dep. approval
+                          </span>
+                        </Link>
+                      )}
+                      {user?.roles.some(
+                        (role) =>
+                          [
+                            "Director HR",
+                            "Welfare Manager",
+                            "Head of Department",
+                          ].includes(role.name) &&
+                          checkUserPermission(user, "get_loans")
+                      ) && (
+                        <Link
+                          href="/reports"
+                          className={
+                            pathname === "/reports"
+                              ? isActiveStyles
+                              : isNotActiveStyles
+                          }
+                        >
+                          <LuClock8 size={20} className="" />
+                          <span className="lg:inline-block md:hidden inline-block">
+                            Reports
+                          </span>
+                        </Link>
+                      )}
                     </nav>
                   </div>
                   <SheetFooter className="justify-self-end">
                     <SheetClose asChild>
-                      <Button className="bg-orangeAccent hover:bg-orangeAccent/75 w-full">
-                        Logout
+                      <Button
+                        type="button"
+                        onClick={handleLogout}
+                        className="bg-orangeAccent hover:bg-orangeAccent/75 w-full"
+                      >
+                        {loading && <Spinner variant="small" />}
+                        {loading ? "Loging..." : "Logout"}
                       </Button>
                     </SheetClose>
                   </SheetFooter>

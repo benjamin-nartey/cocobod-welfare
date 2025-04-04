@@ -55,7 +55,6 @@ export default function RequestLoanForm() {
         toast("Loan application successful");
       }
 
-      console.log({ response });
     } catch (error) {
       console.log(error);
     } finally {

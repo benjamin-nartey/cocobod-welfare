@@ -3,8 +3,8 @@ import PendingLoansTable from "./pending-loans-table";
 import { cookies } from "next/headers";
 import { LoansRequestProps, UserProps } from "@/types";
 import { fetchData } from "@/lib/fetchData";
-import { checkUserPermission } from "@/lib/checkUserPermissions";
 import { PERMISSIONS } from "@/lib/constants/permissions";
+import { canGetAllLoans } from "@/lib/canGetAllLoans";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -18,9 +18,7 @@ export default async function PendingLoansDepartments() {
 
   const userData = (await fetchData(userUrl, accessToken)) as UserProps;
 
-  const canGetAllLoans = checkUserPermission(userData, PERMISSIONS.GET_LOANS);
-
-  const loanUrl = canGetAllLoans
+  const loanUrl = canGetAllLoans(userData, PERMISSIONS.GET_LOANS)
     ? `${BASE_URL}/loans?${params}`
     : `${BASE_URL}/loans/requests/me?${params}`;
 

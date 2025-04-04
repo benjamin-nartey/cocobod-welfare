@@ -8,19 +8,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// import { Clock } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
-// import { FaBalanceScale } from "react-icons/fa";
 import { LuChartNoAxesCombined } from "react-icons/lu";
 import { SlBriefcase } from "react-icons/sl";
 
 import { RadialChartComponent } from "@/components/RadialChart";
 
 import { cookies } from "next/headers";
-import { LoansRequestProps } from "@/types";
+import { LoansRequestProps, UserProps } from "@/types";
 import RecentlyApprovedLoanTable from "./recently-approved-loans";
+import { fetchData } from "@/lib/fetchData";
+import { PERMISSIONS } from "@/lib/constants/permissions";
+import { canGetAllLoans } from "@/lib/canGetAllLoans";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -30,13 +31,23 @@ export const metadata: Metadata = {
 };
 
 export default async function Dashboard() {
+  const userUrl = `${BASE_URL}/user/me`;
+
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
   const params = new URLSearchParams();
   params.append("status", "SIGNED");
 
-  const loanUrl = `${BASE_URL}/loans?${params}`;
+  const pendingParams = new URLSearchParams();
+  pendingParams.append("status", "STARTED");
+
+  const userData = (await fetchData(userUrl, accessToken)) as UserProps;
+
+  const loanUrl = canGetAllLoans(userData, PERMISSIONS.GET_LOANS)
+    ? `${BASE_URL}/loans?${params}`
+    : `${BASE_URL}/loans/requests/me?${params}`;
+
 
   const response = await fetch(loanUrl as string, {
     method: "GET",
@@ -46,7 +57,18 @@ export default async function Dashboard() {
     },
   });
 
+
+  const pendingLoanUrl = canGetAllLoans(userData, PERMISSIONS.GET_LOANS)
+    ? `${BASE_URL}/loans/pending-requests`
+    : `${BASE_URL}/loans/requests/me?${pendingParams}`;
+
+  const pendingLoanRequests = (await fetchData(
+    pendingLoanUrl,
+    accessToken
+  )) as LoansRequestProps;
+
   const loanRequests = (await response.json()) as LoansRequestProps;
+
   return (
     <>
       <div className="w-full flex justify-between items-center">
@@ -71,8 +93,8 @@ export default async function Dashboard() {
           <MetricCard
             color="bg-[#d399e3]"
             title="Pending loans"
-            dataValue="150"
-            trend="120 pending loans that needs you approval"
+            dataValue={`${pendingLoanRequests.data.length}`}
+            trend={`${pendingLoanRequests.data.length} pending loans that needs to be approve`}
           >
             <LuChartNoAxesCombined size={25} className="text-white" />
           </MetricCard>
@@ -82,8 +104,10 @@ export default async function Dashboard() {
           <MetricCard
             color="bg-[#e79577]"
             title="Approved loans"
-            dataValue="220"
-            trend="220 loans approved in total"
+            dataValue={String(loanRequests.data.length)}
+            trend={`${String(
+              loanRequests.data.length
+            )} loans approved in total`}
           >
             <SlBriefcase size={25} className="text-white" />
           </MetricCard>

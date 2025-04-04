@@ -22,7 +22,6 @@ export default async function DepartmentApproval() {
     url,
     accessToken
   )) as LoanRequestByDepartmentProps[];
-  console.log({ allDepartmentsLoanRequest });
   return (
     <div className="">
       <Tabs defaultValue={allDepartmentsLoanRequest[0]?.loanType} className="">

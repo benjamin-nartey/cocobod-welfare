@@ -96,32 +96,6 @@ export function DataTableDefault<TData, TValue>({
     },
   });
 
-  // const handleExport = (): void => {
-  //   // Use the exportFileName prop
-  //   exportToExcel(data, exportFileName.toLowerCase().replace(/\s+/g, "-"));
-  // };
-
-  // const handleExport = (): void => {
-  //   try {
-  //     // Get all current rows based on sorting, filtering, etc.
-  //     const rows = table.getRowModel().rows;
-
-  //     // Map to just the original data objects
-  //     const dataToExport = rows.map(row => row.original);
-
-  //     // Debug what's being exported
-  //     console.log('Exporting data:', dataToExport);
-
-  //     // Use a simple file name
-  //     const fileName = 'table-export';
-
-  //     // Call the export function
-  //     exportToExcel(dataToExport, fileName);
-  //   } catch (error) {
-  //     console.error('Error in handleExport:', error);
-  //   }
-  // };
-
   const handleExport = (): void => {
     try {
       // Get the current data based on filters

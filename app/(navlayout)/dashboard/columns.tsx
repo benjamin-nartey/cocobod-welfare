@@ -10,7 +10,6 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
       accessorKey: "employeeName",
       header: () => <div className="">Name</div>,
       cell: ({ row }) => {
-        // const data = row.getValue("employee") as EmployeeProps;
         const data = row.original.employee;
         return <div>{data?.user?.name}</div>;
       },
@@ -19,7 +18,6 @@ const useColumns = (): ColumnDef<AllLoanRequestProps>[] => {
       accessorKey: "employeeId",
       header: () => <div className="">Staff ID</div>,
       cell: ({ row }) => {
-        // const data = row.getValue("employee") as EmployeeProps;
         const data = row.original.employee;
         return <div>{data?.staffNumber}</div>;
       },
