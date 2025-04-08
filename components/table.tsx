@@ -657,7 +657,7 @@
 //       console.error("Error filtering data:", error);
 //       // Optionally show an error message to the user
 //     } finally {
-      
+
 //     }
 //   };
 
@@ -861,7 +861,6 @@
 //   );
 // }
 
-
 "use client";
 
 import {
@@ -949,8 +948,6 @@ interface DepartmentValueProps {
 interface DepartmentDataProps {
   data: GenericAttributeProps[];
 }
-
-
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -1044,7 +1041,7 @@ export function DataTableDefault<TData, TValue>({
 
     // Close the filter popover after submission
     setFilterPopoverOpen(false);
-    
+
     if (!value) {
       // If no department is selected, revert to initial data
       setData(initialData);
@@ -1061,11 +1058,14 @@ export function DataTableDefault<TData, TValue>({
       const accessToken = await TokeResponse.json();
 
       const userData = (await fetchData(
-        userUrl, 
+        userUrl,
         accessToken?.value
       )) as UserProps;
 
-      const canGetAllLoans = checkUserPermission(userData, PERMISSIONS.GET_LOANS);
+      const canGetAllLoans = checkUserPermission(
+        userData,
+        PERMISSIONS.GET_LOANS
+      );
 
       const loanUrl = canGetAllLoans
         ? `${BASE_URL}/loans?${params}`
@@ -1084,16 +1084,17 @@ export function DataTableDefault<TData, TValue>({
       }
 
       const filteredData = await response.json();
-      
+
       // Update the table data with the filtered results
       setData(filteredData.data as TData[]);
-      
+
       // Reset to first page after filtering
       table.setPageIndex(0);
-      
     } catch (error) {
       console.error("Error filtering data:", error);
       // Optionally show an error message to the user
+    } finally {
+      setValue("");
     }
   };
 
@@ -1104,8 +1105,13 @@ export function DataTableDefault<TData, TValue>({
           <div>
             <Input
               placeholder="Filter Name..."
-              value={(table.getState().columnFilters.find(f => f.id === 'name')?.value as string) ?? ""}
-              onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+              value={
+                (table.getState().columnFilters.find((f) => f.id === "name")
+                  ?.value as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue(event.target.value)
+              }
               className="max-w-sm bg-white shadow-sm rounded-3xl"
             />
           </div>
@@ -1113,7 +1119,10 @@ export function DataTableDefault<TData, TValue>({
 
         {withExcelExport && (
           <div className="flex justify-center items-center gap-4 mr-2">
-            <Popover open={filterPopoverOpen} onOpenChange={setFilterPopoverOpen}>
+            <Popover
+              open={filterPopoverOpen}
+              onOpenChange={setFilterPopoverOpen}
+            >
               <PopoverTrigger>
                 <FilterIcon className="text-orangeAccent hover:text-orangeAccent/75 cursor-pointer" />
               </PopoverTrigger>
