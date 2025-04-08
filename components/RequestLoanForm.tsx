@@ -17,12 +17,15 @@ import { LoanType } from "@/lib/constants/loanType";
 import { LoanTypeEnum } from "@/lib/constants/enums";
 import Spinner from "./Spinner";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default function RequestLoanForm() {
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+
+  const router = useRouter();
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
@@ -53,8 +56,8 @@ export default function RequestLoanForm() {
 
       if (response.ok) {
         toast("Loan application successful");
+        router.refresh();
       }
-
     } catch (error) {
       console.log(error);
     } finally {
