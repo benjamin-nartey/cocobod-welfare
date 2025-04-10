@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -12,6 +12,8 @@ interface Token {
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default function PasswordResetComponents({ token }: Token) {
+  const [loading, setLoading] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
   const router = useRouter();
   console.log({ token });
   const params = new URLSearchParams();
@@ -19,7 +21,8 @@ export default function PasswordResetComponents({ token }: Token) {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    setErrMsg("");
+    setLoading(true);
     try {
       const formData = new FormData(event.currentTarget);
 
@@ -30,7 +33,6 @@ export default function PasswordResetComponents({ token }: Token) {
 
       if (payload.password !== payload.confirmPassword)
         throw new Error("Passwords do not match");
-
       const response = await fetch(
         `${BASE_URL}/auth/reset-password?${params}`,
         {
@@ -49,6 +51,9 @@ export default function PasswordResetComponents({ token }: Token) {
       }
     } catch (error) {
       console.log(error);
+      setErrMsg(`${error}`);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -66,7 +71,7 @@ export default function PasswordResetComponents({ token }: Token) {
         placeholder="Confirm password"
       />
 
-      <span>Passwords do not match</span>
+      <span className="text-red-500 text-sm">{errMsg}</span>
 
       <Button
         className="bg-orangeAccent hover:bg-orangeAccent/75 w-full mt-2"
