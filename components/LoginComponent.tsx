@@ -87,7 +87,7 @@ export default function LoginComponet() {
       <span className="text-sm text-red-500">{errMsg}</span>
       <Link
         className="text-sm text-[#f7966f] hover:underline"
-        href="/password-reset"
+        href="/forgot-password"
       >
         Forgot password?
       </Link>
