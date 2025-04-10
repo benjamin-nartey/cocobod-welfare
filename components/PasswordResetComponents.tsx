@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Spinner from "./Spinner";
 
 interface Token {
   token: string;
@@ -42,13 +43,17 @@ export default function PasswordResetComponents({ token }: Token) {
         }
       );
 
-      if (response.ok) {
-        toast.success("Password reset successful", {
-          description: "Your password has been reset successfuly",
-          className: "green-400",
-        });
-        router.push("/");
+      if (!response.ok) {
+        const data = await response.json();
+
+        if (data?.statusCode === 500) throw new Error("Internal server error");
       }
+
+      toast.success("Password reset successful", {
+        description: "Your password has been reset successfuly",
+        className: "green-400",
+      });
+      router.push("/");
     } catch (error) {
       console.log(error);
       setErrMsg(`${error}`);
@@ -77,7 +82,8 @@ export default function PasswordResetComponents({ token }: Token) {
         className="bg-orangeAccent hover:bg-orangeAccent/75 w-full mt-2"
         type="submit"
       >
-        Submit
+        {loading && <Spinner variant="small" />}
+        {loading ? "Submiting..." : "Submit"}
       </Button>
     </form>
   );
