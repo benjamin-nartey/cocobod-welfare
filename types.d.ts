@@ -1,3 +1,4 @@
+import { DepartmentProps } from "@/types";
 import {
   EmployeeTypeEnum,
   EmployeeStatusEnum,
@@ -49,17 +50,38 @@ interface UserEmployeeProps {
   updatedAt: Date;
 }
 
+// interface EmployeeProps {
+//   id: string;
+//   hireDate: Date;
+//   employeeType:
+//     | EmployeeTypeEnum.JUNIOR
+//     | EmployeeTypeEnum.MANAGEMENT
+//     | EmployeeTypeEnum.SENIOR;
+//   staffNumber: number;
+//   updatedAt: Date;
+//   createdAt: Date;
+//   user: UserEmployeeProps;
+// }
+
 interface EmployeeProps {
   id: string;
+  createdAt: Date;
+  updatedAt: Date;
   hireDate: Date;
+  staffNumber: number;
   employeeType:
     | EmployeeTypeEnum.JUNIOR
     | EmployeeTypeEnum.MANAGEMENT
     | EmployeeTypeEnum.SENIOR;
-  staffNumber: number;
-  updatedAt: Date;
-  createdAt: Date;
-  user: UserEmployeeProps;
+  departmentId: string;
+  divisionId: string;
+  supervisorId: string;
+  districtId: string;
+  regionId: string;
+  userId: string;
+  designationId: string;
+  status: EmployeeStatusEnum.ACTIVE | EmployeeStatusEnum.INACTIVE;
+  department: DepartmentProps;
 }
 
 interface MemberProps extends EmployeeProps {
@@ -67,7 +89,7 @@ interface MemberProps extends EmployeeProps {
     id: string;
     name: string;
     email: string;
-    status: EmployeeStatusEnum;
+    status: EmployeeStatusEnum.ACTIVE | EmployeeStatusEnum.INACTIVE;
     createdAt: Date;
     updatedAt: Date;
     department: GenericAttributeProps;
@@ -80,7 +102,7 @@ interface UserProps {
   id: string;
   name: string;
   email: string;
-  employee: string;
+  employee: EmployeeProps;
   roles: RoleProps[];
   signature: {
     id: "665abb16-b920-4187-b984-171647f709b5";

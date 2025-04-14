@@ -34,6 +34,8 @@ export async function middleware(req: NextRequest) {
     if (userResponse.ok) {
       const user: UserProps = await userResponse.json();
 
+      console.log({ user });
+
       return checkRoutePermissions(req, user, protectedRoutes);
     }
 

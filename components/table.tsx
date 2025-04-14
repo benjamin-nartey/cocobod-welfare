@@ -914,7 +914,7 @@ import { Button } from "@/components/ui/button";
 import React, { useEffect, useState, FormEvent } from "react";
 import { Input } from "@/components/ui/input";
 
-import { addDays } from "date-fns";
+import { addDays, format } from "date-fns";
 import { DateRange } from "react-day-picker";
 
 import {
@@ -984,6 +984,13 @@ export function DataTableDefault<TData, TValue>({
     to: addDays(new Date(new Date().getFullYear(), 0, 20), 20),
   });
 
+  const [currentUserData, setCurrentUserData] = useState<UserProps | null>(
+    null
+  );
+
+  console.log("from", date?.from);
+  console.log("to", date?.to);
+
   const table = useReactTable({
     data,
     columns,
@@ -1002,6 +1009,11 @@ export function DataTableDefault<TData, TValue>({
       rowSelection,
     },
   });
+
+  console.log(
+    "issss",
+    currentUserData?.roles.some((role) => ["Director HR"].includes(role.name))
+  );
 
   const getDepartmentData = async () => {
     const TokeResponse = await fetch("/api/get-cookie?name=accessToken");
@@ -1046,6 +1058,24 @@ export function DataTableDefault<TData, TValue>({
     }
   };
 
+  const fetchCurrentUser = async () => {
+    const userUrl = `${BASE_URL}/user/me`;
+
+    const TokeResponse = await fetch("/api/get-cookie?name=accessToken");
+    const accessToken = await TokeResponse.json();
+
+    const userData = (await fetchData(
+      userUrl,
+      accessToken?.value
+    )) as UserProps;
+
+    setCurrentUserData(userData);
+  };
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -1059,27 +1089,40 @@ export function DataTableDefault<TData, TValue>({
     }
 
     try {
-      const userUrl = `${BASE_URL}/user/me`;
-      const params = new URLSearchParams();
-      params.append("status", "SIGNED");
-      params.append("departmentId", value);
+      // const userUrl = `${BASE_URL}/user/me`;
 
-      const TokeResponse = await fetch("/api/get-cookie?name=accessToken");
-      const accessToken = await TokeResponse.json();
+      // const TokeResponse = await fetch("/api/get-cookie?name=accessToken");
+      // const accessToken = await TokeResponse.json();
 
-      const userData = (await fetchData(
-        userUrl,
-        accessToken?.value
-      )) as UserProps;
+      // const userData = (await fetchData(
+      //   userUrl,
+      //   accessToken?.value
+      // )) as UserProps;
 
       const canGetAllLoans = checkUserPermission(
-        userData,
+        currentUserData as UserProps,
         PERMISSIONS.GET_LOANS
       );
+
+      const params = new URLSearchParams();
+      params.append("status", "SIGNED");
+      params.append(
+        "departmentId",
+        currentUserData?.roles.some((role) =>
+          ["Director HR"].includes(role.name)
+        )
+          ? value
+          : (currentUserData?.employee?.departmentId as string)
+      );
+      params.append("from", date?.from ? format(date.from, "yyyy-MM-dd") : "");
+      params.append("to", date?.to ? format(date.to, "yyyy-MM-dd") : "");
 
       const loanUrl = canGetAllLoans
         ? `${BASE_URL}/loans?${params}`
         : `${BASE_URL}/loans/requests/me?${params}`;
+
+      const TokeResponse = await fetch("/api/get-cookie?name=accessToken");
+      const accessToken = await TokeResponse.json();
 
       const response = await fetch(loanUrl as string, {
         method: "GET",
@@ -1105,6 +1148,10 @@ export function DataTableDefault<TData, TValue>({
       // Optionally show an error message to the user
     } finally {
       setValue("");
+      setDate({
+        from: new Date(2022, 0, 20),
+        to: addDays(new Date(new Date().getFullYear(), 0, 20), 20),
+      });
     }
   };
 
@@ -1141,58 +1188,65 @@ export function DataTableDefault<TData, TValue>({
               <PopoverContent>
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col gap-4">
-                    <Popover open={open} onOpenChange={setOpen}>
-                      <PopoverTrigger className="rounded-3xl" asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={open}
-                          className="w-full justify-between"
-                        >
-                          {value
-                            ? departmentsValue.find(
-                                (department) => department.value === value
-                              )?.label
-                            : "Select department..."}
-                          <ChevronsUpDown className="opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full p-0">
-                        <Command>
-                          <CommandInput
-                            placeholder="Search department..."
-                            className="h-9"
-                          />
-                          <CommandList>
-                            <CommandEmpty>No department found.</CommandEmpty>
-                            <CommandGroup>
-                              {departmentsValue.map((department) => (
-                                <CommandItem
-                                  key={department.value}
-                                  value={department.value}
-                                  onSelect={(currentValue) => {
-                                    setValue(
-                                      currentValue === value ? "" : currentValue
-                                    );
-                                    setOpen(false);
-                                  }}
-                                >
-                                  {department.label}
-                                  <Check
-                                    className={cn(
-                                      "ml-auto",
-                                      value === department.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
+                    {currentUserData?.roles.some((role) =>
+                      ["Director HR"].includes(role.name)
+                    ) && (
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger className="rounded-3xl" asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={open}
+                            className="w-full justify-between"
+                          >
+                            {value
+                              ? departmentsValue.find(
+                                  (department) => department.value === value
+                                )?.label
+                              : "Select department..."}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search department..."
+                              className="h-9"
+                            />
+                            <CommandList>
+                              <CommandEmpty>No department found.</CommandEmpty>
+                              <CommandGroup>
+                                {departmentsValue.map((department) => (
+                                  <CommandItem
+                                    key={department.value}
+                                    value={department.value}
+                                    onSelect={(currentValue) => {
+                                      setValue(
+                                        currentValue === value
+                                          ? ""
+                                          : currentValue
+                                      );
+                                      setOpen(false);
+                                    }}
+                                  >
+                                    {department.label}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        value === department.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    )}
+
                     <DatePickerWithRange date={date} setDate={setDate} />
                     <Button
                       className="bg-orangeAccent hover:bg-orangeAccent/75"
