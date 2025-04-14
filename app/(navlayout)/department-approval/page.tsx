@@ -12,6 +12,13 @@ import { cookies } from "next/headers";
 import { LoanRequestByDepartmentProps } from "@/types";
 import { LottieNoDataSvg } from "@/components/lottieSvg";
 
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Department Approval",
+  description:
+    "This is the department-approval page for COCOBOD welfare application",
+};
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default async function DepartmentApproval() {

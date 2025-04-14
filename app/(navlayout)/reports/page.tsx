@@ -6,6 +6,13 @@ import { fetchData } from "@/lib/fetchData";
 import { checkUserPermission } from "@/lib/checkUserPermissions";
 import { PERMISSIONS } from "@/lib/constants/permissions";
 
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Reports",
+  description:
+    "This is the reports page for COCOBOD welfare application",
+};
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default async function PendingLoansDepartments() {

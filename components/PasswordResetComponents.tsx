@@ -34,6 +34,7 @@ export default function PasswordResetComponents({ token }: Token) {
 
       if (payload.password !== payload.confirmPassword)
         throw new Error("Passwords do not match");
+
       const response = await fetch(
         `${BASE_URL}/auth/reset-password?${params}`,
         {

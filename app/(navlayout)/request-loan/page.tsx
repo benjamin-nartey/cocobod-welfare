@@ -5,6 +5,12 @@ import RequestLoanForm from "@/components/RequestLoanForm";
 
 import LottieVideo from "@/components/LottieVideo";
 
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Request Loan",
+  description: "This is the request-loan page for COCOBOD welfare application",
+};
+
 export default function RequestLoan() {
   return (
     <div>
@@ -22,5 +28,3 @@ export default function RequestLoan() {
     </div>
   );
 }
-
-

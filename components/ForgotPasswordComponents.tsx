@@ -1,20 +1,23 @@
 "use client";
 
-import React, { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 
 import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
+import Spinner from "./Spinner";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default function ForgotPasswordComponents() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(false);
 
     try {
       const formData = new FormData(event.currentTarget);
@@ -35,6 +38,8 @@ export default function ForgotPasswordComponents() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -50,7 +55,8 @@ export default function ForgotPasswordComponents() {
         className="bg-orangeAccent hover:bg-orangeAccent/75 w-full mt-2"
         type="submit"
       >
-        Submit
+        {loading && <Spinner variant="small" />}
+        {loading ? "Submiting..." : "Submit"}
       </Button>
     </form>
   );

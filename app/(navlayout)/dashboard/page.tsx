@@ -1,13 +1,5 @@
 import MetricCard from "@/components/MetricCard";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
@@ -48,7 +40,6 @@ export default async function Dashboard() {
     ? `${BASE_URL}/loans?${params}`
     : `${BASE_URL}/loans/requests/me?${params}`;
 
-
   const response = await fetch(loanUrl as string, {
     method: "GET",
     headers: {
@@ -56,7 +47,6 @@ export default async function Dashboard() {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-
 
   const pendingLoanUrl = canGetAllLoans(userData, PERMISSIONS.GET_LOANS)
     ? `${BASE_URL}/loans/pending-requests`
@@ -73,20 +63,6 @@ export default async function Dashboard() {
     <>
       <div className="w-full flex justify-between items-center">
         <h2 className="text-lg font-medium">Overview</h2>
-        <Select>
-          <SelectTrigger className="w-[180px] rounded-3xl focus-within:ring-transparent focus-visible:ring-transparent">
-            <SelectValue placeholder="Select activity" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Activity</SelectLabel>
-              <SelectItem value="last30Days">Last 30 days</SelectItem>
-              <SelectItem value="last3Months">Last 3 months</SelectItem>
-              <SelectItem value="last6Months">Last 6 months</SelectItem>
-              <SelectItem value="last12Months">Last 12 months</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
       </div>
       <div className="w-full grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 place-items-center py-4 gap-4">
         <Link className="w-full" href="/pending-loans">

@@ -6,6 +6,13 @@ import { LoansRequestProps, UserProps } from "@/types";
 import { PERMISSIONS } from "@/lib/constants/permissions";
 import { canGetAllLoans } from "@/lib/canGetAllLoans";
 
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Pending Loans",
+  description:
+    "This is the pending-loans page for COCOBOD welfare application",
+};
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default async function PendingLoans() {

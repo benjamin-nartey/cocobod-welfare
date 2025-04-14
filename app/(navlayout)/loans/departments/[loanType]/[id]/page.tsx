@@ -3,6 +3,13 @@ import PendingLoansTable from "./pending-loans-table";
 import { cookies } from "next/headers";
 import { AllLoanRequestProps } from "@/types";
 
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: " All Pending Loans Departments",
+  description:
+    "This is the all-pending-loans-departments page for COCOBOD welfare application",
+};
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 type Params = {

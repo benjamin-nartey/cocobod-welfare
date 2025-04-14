@@ -6,9 +6,16 @@ import { fetchData } from "@/lib/fetchData";
 import { PERMISSIONS } from "@/lib/constants/permissions";
 import { canGetAllLoans } from "@/lib/canGetAllLoans";
 
+import { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Approved Loans",
+  description:
+    "This is the approved-loans page for COCOBOD welfare application",
+};
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-export default async function PendingLoansDepartments() {
+export default async function ApprovedLoans() {
   const userUrl = `${BASE_URL}/user/me`;
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;

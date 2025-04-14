@@ -113,6 +113,7 @@ export default function NavLayout({
         <div className="py-16">
           <nav className="flex flex-col w-full gap-2">
             <Link
+              id="dashboard"
               href="/dashboard"
               className={
                 pathname === "/dashboard" ? isActiveStyles : isNotActiveStyles
@@ -129,6 +130,7 @@ export default function NavLayout({
                 checkUserPermission(user, "request_loan")
             ) && (
               <Link
+                id="request-loan"
                 href="/request-loan"
                 className={
                   pathname === "/request-loan"
@@ -148,6 +150,7 @@ export default function NavLayout({
                 checkUserPermission(user, "get_loans")
             ) && (
               <Link
+                id="department-approval"
                 href="/department-approval"
                 className={
                   pathname === "/department-approval"
@@ -170,6 +173,7 @@ export default function NavLayout({
                 ].includes(role.name) && checkUserPermission(user, "get_loans")
             ) && (
               <Link
+                id="reports"
                 href="/reports"
                 className={
                   pathname === "/reports" ? isActiveStyles : isNotActiveStyles
@@ -191,19 +195,19 @@ export default function NavLayout({
               <div className="bg-white p-1 rounded-3xl lg:w-[30rem] md:w-[25rem] w-[20rem]">
                 <form className="flex items-center justify-center">
                   <Button
-                    role="search"
+                    aria-label="searchBtn"
+                    type="submit"
                     size="icon"
                     className=" text-gray-400 text-lg bg-tansparent hover:bg-transparent"
                   >
-                    <Search
-                      role="search"
-                      className="text-[#524946] !w-[1.3rem] !h-[1.3rem]"
-                    />
+                    <Search className="text-[#524946] !w-[1.3rem] !h-[1.3rem]" />
                   </Button>
                   <input
                     className="w-full placeholder:text-sm placeholder:font-light focus:outline-none outline-none text-base"
                     type="text"
                     placeholder="Search here.."
+                    name="searchAll"
+                    id="searchAll"
                   />
                 </form>
               </div>
@@ -223,7 +227,10 @@ export default function NavLayout({
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button className="w-8 h-8 hover:bg-transparent bg-white grid place-items-center rounded-full ">
+                      <Button
+                        aria-label="dropdown"
+                        className="w-8 h-8 hover:bg-transparent bg-white grid place-items-center rounded-full "
+                      >
                         <ChevronDown className="text-[#524946]" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -244,6 +251,7 @@ export default function NavLayout({
               <Sheet>
                 <SheetTrigger asChild>
                   <span
+                    aria-label="menu"
                     role="button"
                     className="lg:hidden md:hidden flex items-center justify-center text-[#df5d29]"
                   >
@@ -279,6 +287,7 @@ export default function NavLayout({
                   <div className="mt-16 flex flex-col justify-between ">
                     <nav className="flex flex-col w-full gap-2">
                       <Link
+                        id="dashboard"
                         href="/dashboard"
                         className={
                           pathname === "/dashboard"
@@ -297,6 +306,7 @@ export default function NavLayout({
                           checkUserPermission(user, "request_loan")
                       ) && (
                         <Link
+                          id="request-loan"
                           href="/request-loan"
                           className={
                             pathname === "/request-loan"
@@ -316,6 +326,7 @@ export default function NavLayout({
                           checkUserPermission(user, "get_loans")
                       ) && (
                         <Link
+                          id="department-approval"
                           href="/department-approval"
                           className={
                             pathname === "/department-approval"
@@ -339,6 +350,7 @@ export default function NavLayout({
                           checkUserPermission(user, "get_loans")
                       ) && (
                         <Link
+                          id="reports"
                           href="/reports"
                           className={
                             pathname === "/reports"

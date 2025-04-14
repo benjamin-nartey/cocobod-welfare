@@ -80,7 +80,7 @@ export default function RequestLoanForm() {
               <SelectGroup>
                 <SelectLabel>Loan types</SelectLabel>
                 {LoanType.map((loan, id) => (
-                  <SelectItem className="capitalize" key={id} value={loan}>
+                  <SelectItem className="capitalize" key={id} value={loan} >
                     {loan.replace("_", " ").toLowerCase()}
                   </SelectItem>
                 ))}
@@ -95,6 +95,7 @@ export default function RequestLoanForm() {
             rows={10}
             placeholder="Add your comments here..."
             name="comments"
+            id="comments"
           />
           <span className="text-sm text-red-500 mt-1">{errMsg}</span>
           <Button

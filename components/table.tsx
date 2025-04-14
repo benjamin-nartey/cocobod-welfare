@@ -913,6 +913,10 @@ import {
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState, FormEvent } from "react";
 import { Input } from "@/components/ui/input";
+
+import { addDays } from "date-fns";
+import { DateRange } from "react-day-picker";
+
 import {
   ChevronLeft,
   ChevronRight,
@@ -927,6 +931,7 @@ import { fetchData } from "@/lib/fetchData";
 import { GenericAttributeProps, UserProps } from "@/types";
 import { checkUserPermission } from "@/lib/checkUserPermissions";
 import { PERMISSIONS } from "@/lib/constants/permissions";
+import { DatePickerWithRange } from "./DateRangePicker";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -973,6 +978,11 @@ export function DataTableDefault<TData, TValue>({
   const [departmentsValue, setDepartmentsValue] = useState<
     DepartmentValueProps[]
   >([]);
+
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: new Date(2022, 0, 20),
+    to: addDays(new Date(new Date().getFullYear(), 0, 20), 20),
+  });
 
   const table = useReactTable({
     data,
@@ -1113,6 +1123,8 @@ export function DataTableDefault<TData, TValue>({
                 table.getColumn("name")?.setFilterValue(event.target.value)
               }
               className="max-w-sm bg-white shadow-sm rounded-3xl"
+              id="filterName"
+              name="filterName"
             />
           </div>
         )}
@@ -1181,6 +1193,7 @@ export function DataTableDefault<TData, TValue>({
                         </Command>
                       </PopoverContent>
                     </Popover>
+                    <DatePickerWithRange date={date} setDate={setDate} />
                     <Button
                       className="bg-orangeAccent hover:bg-orangeAccent/75"
                       type="submit"
