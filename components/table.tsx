@@ -932,6 +932,7 @@ import { GenericAttributeProps, UserProps } from "@/types";
 import { checkUserPermission } from "@/lib/checkUserPermissions";
 import { PERMISSIONS } from "@/lib/constants/permissions";
 import { DatePickerWithRange } from "./DateRangePicker";
+import { toast } from "sonner";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -974,6 +975,7 @@ export function DataTableDefault<TData, TValue>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState<TData[]>(initialData);
+  const [errMsg, setErrMsg] = useState("");
 
   const [departmentsValue, setDepartmentsValue] = useState<
     DepartmentValueProps[]
@@ -1079,25 +1081,17 @@ export function DataTableDefault<TData, TValue>({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Close the filter popover after submission
-    setFilterPopoverOpen(false);
-
-    if (!value) {
-      // If no department is selected, revert to initial data
-      setData(initialData);
-      return;
-    }
+    setErrMsg("");
 
     try {
-      // const userUrl = `${BASE_URL}/user/me`;
-
-      // const TokeResponse = await fetch("/api/get-cookie?name=accessToken");
-      // const accessToken = await TokeResponse.json();
-
-      // const userData = (await fetchData(
-      //   userUrl,
-      //   accessToken?.value
-      // )) as UserProps;
+      if (
+        !value &&
+        !!currentUserData?.roles.some((role) =>
+          ["Director HR"].includes(role.name)
+        )
+      ) {
+        throw new Error("Please select department");
+      }
 
       const canGetAllLoans = checkUserPermission(
         currentUserData as UserProps,
@@ -1143,9 +1137,9 @@ export function DataTableDefault<TData, TValue>({
 
       // Reset to first page after filtering
       table.setPageIndex(0);
+      setFilterPopoverOpen(false);
     } catch (error) {
-      console.error("Error filtering data:", error);
-      // Optionally show an error message to the user
+      setErrMsg(`${error}`);
     } finally {
       setValue("");
       setDate({
@@ -1248,6 +1242,8 @@ export function DataTableDefault<TData, TValue>({
                     )}
 
                     <DatePickerWithRange date={date} setDate={setDate} />
+
+                    <span className="text-sm text-red-500">{errMsg}</span>
                     <Button
                       className="bg-orangeAccent hover:bg-orangeAccent/75"
                       type="submit"

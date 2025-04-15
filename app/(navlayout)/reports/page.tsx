@@ -9,8 +9,7 @@ import { PERMISSIONS } from "@/lib/constants/permissions";
 import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Reports",
-  description:
-    "This is the reports page for COCOBOD welfare application",
+  description: "This is the reports page for COCOBOD welfare application",
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -20,10 +19,19 @@ export default async function PendingLoansDepartments() {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
+  const userData = (await fetchData(userUrl, accessToken)) as UserProps;
   const params = new URLSearchParams();
   params.append("status", "SIGNED");
-
-  const userData = (await fetchData(userUrl, accessToken)) as UserProps;
+  params.append(
+    `${
+      userData?.roles.some((role) => ["Director HR"].includes(role.name))
+        ? ""
+        : "departmentId"
+    }`,
+    userData?.roles.some((role) => ["Director HR"].includes(role.name))
+      ? ""
+      : (userData?.employee?.departmentId as string)
+  );
 
   const canGetAllLoans = checkUserPermission(userData, PERMISSIONS.GET_LOANS);
 
